@@ -75,12 +75,12 @@ jobs:
           # Ensure necessary dirs
           mkdir -p gen-repo/base/frontend/v1
           mkdir -p gen-repo/events/v1
-          mkdir -p gen-repo/service/frontend/client/v1
+          mkdir -p gen-repo/service/frontend/client_stats/v1
 
           # Copy over only the generated files (corrected source dir to proto-src)
           rsync -av proto-src/base/frontend/v1/*.pb.go gen-repo/base/frontend/v1/ || true
           rsync -av proto-src/events/v1/*.pb.go gen-repo/events/v1/ || true
-          rsync -av proto-src/service/frontend/client/v1/*.pb.go gen-repo/service/frontend/client/v1/ || true
+          rsync -av proto-src/service/frontend/client_stats/v1/*.pb.go gen-repo/service/frontend/client_stats/v1/ || true
 
           # Debug output
           echo "Listing generated .pb.go files in gen-repo:"

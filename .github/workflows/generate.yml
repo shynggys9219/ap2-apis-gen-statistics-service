@@ -31,8 +31,6 @@ jobs:
         run: |
           go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-          echo "GOPATH bin: $(go env GOPATH)/bin"
-          export PATH="$PATH:$(go env GOPATH)/bin"
 
       - name: Clone Proto Files Repository
         run: |
@@ -40,6 +38,7 @@ jobs:
 
       - name: Generate Go Code from Proto Files
         run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
           cd proto-src
 
           echo "Directory structure:"
@@ -71,7 +70,6 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          # Clone target repo OUTSIDE of proto repo
           git clone https://github.com/shynggys9219/ap2-apis-gen-statistics-service.git gen-repo
 
           # Ensure necessary dirs
@@ -79,10 +77,14 @@ jobs:
           mkdir -p gen-repo/events/v1
           mkdir -p gen-repo/service/frontend/client/v1
 
-          # Copy over only the generated files
-          rsync -av proto-repo/base/frontend/v1/*.pb.go gen-repo/base/frontend/v1/ || true
-          rsync -av proto-repo/events/v1/*.pb.go gen-repo/events/v1/ || true
-          rsync -av proto-repo/service/frontend/client/v1/*.pb.go gen-repo/service/frontend/client/v1/ || true
+          # Copy over only the generated files (corrected source dir to proto-src)
+          rsync -av proto-src/base/frontend/v1/*.pb.go gen-repo/base/frontend/v1/ || true
+          rsync -av proto-src/events/v1/*.pb.go gen-repo/events/v1/ || true
+          rsync -av proto-src/service/frontend/client/v1/*.pb.go gen-repo/service/frontend/client/v1/ || true
+
+          # Debug output
+          echo "Listing generated .pb.go files in gen-repo:"
+          find gen-repo -name "*.pb.go"
 
           cd gen-repo
 

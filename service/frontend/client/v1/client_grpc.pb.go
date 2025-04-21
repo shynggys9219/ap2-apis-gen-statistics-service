@@ -19,14 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ClientStatisticsService_Get_FullMethodName  = "/statistics.service.frontend.client.v1.ClientStatisticsService/Get"
-	ClientStatisticsService_List_FullMethodName = "/statistics.service.frontend.client.v1.ClientStatisticsService/List"
+	ClientStatisticsService_Create_FullMethodName = "/statistics.service.frontend.client.v1.ClientStatisticsService/Create"
+	ClientStatisticsService_Get_FullMethodName    = "/statistics.service.frontend.client.v1.ClientStatisticsService/Get"
+	ClientStatisticsService_List_FullMethodName   = "/statistics.service.frontend.client.v1.ClientStatisticsService/List"
 )
 
 // ClientStatisticsServiceClient is the client API for ClientStatisticsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClientStatisticsServiceClient interface {
+	// ------------------------
+	// Create: create a client statistics
+	// ------------------------
+	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	// ------------------------
 	// Get: get a client statistics
 	// ------------------------
@@ -43,6 +48,15 @@ type clientStatisticsServiceClient struct {
 
 func NewClientStatisticsServiceClient(cc grpc.ClientConnInterface) ClientStatisticsServiceClient {
 	return &clientStatisticsServiceClient{cc}
+}
+
+func (c *clientStatisticsServiceClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
+	out := new(CreateResponse)
+	err := c.cc.Invoke(ctx, ClientStatisticsService_Create_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *clientStatisticsServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
@@ -68,6 +82,10 @@ func (c *clientStatisticsServiceClient) List(ctx context.Context, in *ListReques
 // for forward compatibility
 type ClientStatisticsServiceServer interface {
 	// ------------------------
+	// Create: create a client statistics
+	// ------------------------
+	Create(context.Context, *CreateRequest) (*CreateResponse, error)
+	// ------------------------
 	// Get: get a client statistics
 	// ------------------------
 	Get(context.Context, *GetRequest) (*GetResponse, error)
@@ -82,6 +100,9 @@ type ClientStatisticsServiceServer interface {
 type UnimplementedClientStatisticsServiceServer struct {
 }
 
+func (UnimplementedClientStatisticsServiceServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
 func (UnimplementedClientStatisticsServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
@@ -100,6 +121,24 @@ type UnsafeClientStatisticsServiceServer interface {
 
 func RegisterClientStatisticsServiceServer(s grpc.ServiceRegistrar, srv ClientStatisticsServiceServer) {
 	s.RegisterService(&ClientStatisticsService_ServiceDesc, srv)
+}
+
+func _ClientStatisticsService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientStatisticsServiceServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ClientStatisticsService_Create_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientStatisticsServiceServer).Create(ctx, req.(*CreateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ClientStatisticsService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -145,6 +184,10 @@ var ClientStatisticsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "statistics.service.frontend.client.v1.ClientStatisticsService",
 	HandlerType: (*ClientStatisticsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Create",
+			Handler:    _ClientStatisticsService_Create_Handler,
+		},
 		{
 			MethodName: "Get",
 			Handler:    _ClientStatisticsService_Get_Handler,

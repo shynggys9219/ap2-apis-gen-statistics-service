@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: service/frontend/client/v1/client.proto
 
-package client
+package statsclient
 
 import (
 	context "context"
